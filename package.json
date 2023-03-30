@@ -1,0 +1,28 @@
+{
+
+  "name": "db_prac",
+  "version": "1.0.0",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiny43/230330mysql_prac.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jiny43/230330mysql_prac/issues"
+  },
+  "homepage": "https://github.com/jiny43/230330mysql_prac#readme",
+  "dependencies": {
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.22",
+    "sanitize-html": "^1.18.2"
+  }
+}
