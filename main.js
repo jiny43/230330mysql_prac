@@ -1,12 +1,13 @@
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
-var qs = require('querystring');
-var template = require('./lib/template.js');
-var path = require('path');
-var sanitizeHtml = require('sanitize-html');
+const http = require('http');
+const fs = require('fs');
+const url = require('url');
+//url 모듈은 url 정보를 객체로 가져와서 분석(parse)하거나, url 객체를 문자열로 바꿔주는 기능(format, resolve)을 수행합니다.
+const qs = require('querystring');
+const template = require('./lib/template.js');
+const path = require('path');
+const sanitizeHtml = require('sanitize-html');
 const mysql = require('mysql');
-var db = mysql.createConnection({
+const db = mysql.createConnection({
   host     : '127.0.0.1',
   user     : 'root',
   password : 'Xxia1215@@',
@@ -14,7 +15,7 @@ var db = mysql.createConnection({
 });
 db.connect();
 
-var app = http.createServer(function(request,response){
+const app = http.createServer(function(request,response){
     var _url = request.url;
     var queryData = url.parse(_url, true).query;
     var pathname = url.parse(_url, true).pathname;
@@ -39,16 +40,19 @@ var app = http.createServer(function(request,response){
           if(error){
             throw error;
           }
-          db.query(`SELECT * FROM topic WHERE id =${queryData.id}`, function(error2,topic){
+          db.query(`SELECT * FROM topic left join author on topic.author_id=author.id WHERE topic.id =${queryData.id}`, function(error2,topic){
             if(error2){
               throw error2;
             }
+            console.log(topic);
             const title =topic[0].title;
             const description = topic[0].description;
             var list = template.list(topics);
             var html = template.HTML(title, list,
-            `<h2>${title}</h2>${description}`,
-            ` <a href="/create">create</a>
+            `<h2>${title}</h2>${description}
+            <p>by${topic[0].name}</p>`,
+            
+            `<a href="/create">create</a>
                 <a href="/update?id=${queryData.id}">update</a>
                 <form action="delete_process" method="post">
                   <input type="hidden" name="id" value="${queryData.id}">
@@ -63,14 +67,24 @@ var app = http.createServer(function(request,response){
       //글 생성
     } else if(pathname === '/create'){
       db.query(`SELECT * FROM topic`, function(error,topics){
-        var title = 'Create';
-        var list = template.list(topics);
-        var html = template.HTML(title, list,
+        db.query(`SELECT * FORM author`, function(error2,authors){
+          const title = 'Create';
+
+          let tag = '';
+          
+          
+          const list = template.list(topics);
+          const html = template.HTML(title, list,
           `
           <form action="/create_process" method="post">
             <p><input type="text" name="title" placeholder="title"></p>
             <p>
               <textarea name="description" placeholder="description"></textarea>
+            </p>
+            <p>
+            <select name"author">
+            ${tag}
+            </select>
             </p>
             <p>
               <input type="submit">
@@ -82,6 +96,7 @@ var app = http.createServer(function(request,response){
         response.writeHead(200);
         response.end(html);
       });
+    });
     } else if(pathname === '/create_process'){
       var body = '';
       request.on('data', function(data){
